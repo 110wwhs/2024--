@@ -1,0 +1,2228 @@
+
+
+#기본 스킬=============================================================================================================================================
+        
+
+
+#variables----------------------------------------------------------------------
+variables:
+    레비아탄_L_s:
+        type: player
+        default: 0
+        min: 0
+        max: 2
+        permanent: false
+    
+#매직아이템--------------------------------------------------------------
+predefined-items:
+    레비아탄:
+        type: "276"
+        name: "&b레&3비&9아&1탄&7의대검"
+        lore:
+            - ""
+            - "&f전능한 하늘의 용은 그 신성한 낙뢰로 죄인들을 심판한다.   "
+            - ""
+        unbreakable: true
+        attributes:
+            attr1: "generic.attackDamage 20 add mainhand"
+          
+    
+#지급-------------------------------------------------------------------
+레비아탄_Conjure:
+    spell-class: ".instant.ConjureSpell"
+    items:
+        - 레비아탄
+    add-to-inventory: true
+    str-cast-self: "&f《 레비아탄&b레&3비&9아&1탄 &f》레비아탄&b레&3비&9아&1탄&f이 &e지급&f되었습니다."
+    incantations:
+        - /레비아탄
+
+#패시브-----------------------------------------------------------------------------------
+
+레비아탄_lightning_Passive:
+    spell-class: ".PassiveSpell"
+    always-granted: true
+    can-cast-by-command: false
+    chance: 5
+    triggers:
+        - givedamage
+    modifiers:
+        - hasitem 276|&b레&3비&9아&1탄&7의대검 required
+    spells:
+        - 레비아탄_passive_lightning
+    effects:
+      1:
+        effect: sound
+        sound: block.glass.break
+        position: caster
+        volume: 3
+        pitch: 1.5
+        
+        
+레비아탄_passive_lightning:
+    spell-class: ".targeted.StunSpell"
+    duration: 1
+    effects:
+      1:
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 0.5
+        vert-spread: 0.5
+        count: 120
+        speed: 0.001
+        position: target
+        effects:
+      2:
+        effect: lightning
+        position: target
+        
+레비아탄_passive:
+  spell-class: ".PassiveSpell"
+  always-granted: true
+  str-cast-self: "&f《 레비아탄&b레&3비&9아&1탄 &f》 &b연쇄 &f: 발동되었습니다 ."
+  modifiers:
+    - hasitem 276|&b레&3비&9아&1탄&7의대검 required
+  can-cast-by-command: false
+  triggers:
+    - givedamage
+  chance: 15
+  spells:
+    - 레비아탄_passive_chin
+
+레비아탄_passive_chin:
+    spell-class: ".targeted.ChainSpell"
+    spell: 레비아탄_passive_pain
+    bounces: 5
+    bounce-range: 10
+    interval: 10
+    beneficial: false
+    target-players: false
+    target-non-players: true
+    effects:
+        - line particleline 0.25 MagicCrit 0.05 0.05 0.1 4 0.001
+        - line particleline 0.25 reddust 0.01 0.01 0.00001 1 0.001
+        - line particleline 0.25 instantspell 0.01 0.01 0.00001 1 0.001
+
+레비아탄_Passive_pain:
+  spell-class: ".targeted.PainSpell"
+  damage: 4
+  effects:
+      1:
+        
+        effect: lightning
+        position: target
+
+
+    
+#쉬쉬-------------------------------------------------------------------------------------
+레비아탄_leap: 
+    spell-class: ".instant.LeapSpell"   
+    forward-velocity: 0
+    upward-velocity: 0
+    cancel-damage: true 
+
+레비아탄_SS_potion1:
+    spell-class: ".targeted.PotionEffectSpell"
+    type: speed
+    duration: 300
+    strength: 1
+    targeted: false
+    ambient: false
+    hidden: true
+
+레비아탄_SS_potion2:
+    spell-class: ".targeted.PotionEffectSpell"
+    type: strength
+    duration: 300
+    strength: 5
+    targeted: false
+    ambient: false
+    hidden: true
+
+레비아탄_SS_potion3:
+    spell-class: ".targeted.PotionEffectSpell"
+    type: regeneration
+    duration: 300
+    strength: 1 
+    targeted: false
+    ambient: false
+    hidden: true
+
+레비아탄_SS_P1:
+  spell-class: ".PassiveSpell"
+  triggers:
+    - stopsneak
+  modifiers:
+    - holding 276|&b레&3비&9아&1탄&7의대검 required
+    - buffactive 레비아탄_SS_P_time denied
+  spells:
+    - 레비아탄_SS_P_time
+    
+레비아탄_SS_P_time:
+    spell-class: ".buff.DummySpell"
+    duration: 0.2
+    
+레비아탄_SS_P2:
+    spell-class: ".PassiveSpell"
+    always-granted: true
+    triggers:
+      - sneak
+    modifiers:
+      - holding 276|&b레&3비&9아&1탄&7의대검 required
+      - buffactive 레비아탄_SS_P_time required
+    spells:
+      - 레비아탄_SS(mode=full)
+     
+레비아탄_SS:
+    spell-class: ".MultiSpell"
+    cooldown: 120
+    spells:
+        - 레비아탄_SS_fly
+        - 레비아탄_SS_potion1
+        - 레비아탄_SS_potion2
+        - 레비아탄_SS_potion3
+        - DELAY 200
+        - 레비아탄_leap
+        
+레비아탄_SS_fly:
+    spell-class: ".buff.WindwalkSpell"
+    fly-speed: 0.4
+    launch-speed: 0.5
+    cancel-on-land: false
+    cancel-on-logout: false
+    cancel-on-teleport: false
+    duration: 10
+    effects:
+        eff1:
+            position: orbit #저번 강좌 참고
+            effect: particles 
+            particle-name: instantSpell
+            horiz-spread: 0.2
+            vert-spread: 0.0001
+            speed: 0.0001
+            count: 50
+            orbit-radius: 1.3
+            orbit-seconds-per-revolution: 0.5
+            orbit-tick-interval: 1
+            orbit-counter-clockwise: true
+            orbit-y-offset: 1
+        eff2:
+            effect: sound
+            sound: entity.enderdragon.flap
+            pitch: 0.9
+            volume: 1.5
+            position: caster
+        eff3:
+            position: orbit #저번 강좌 참고
+            effect: particles 
+            particle-name: MagicCrit
+            horiz-spread: 0.2
+            vert-spread: 0.001
+            speed: 0.25
+            count: 
+            orbit-radius: 1.5
+            orbit-seconds-per-revolution: 0.5
+            orbit-tick-interval: 1
+            orbit-counter-clockwise: true
+            orbit-y-offset: 1
+  
+    
+#우클릭--------------------------------------------------------
+
+레비아탄_R_silence:
+    spell-class: ".targeted.SilenceSpell"
+    range: 1
+    prevent-cast: true
+    prevent-chat: false
+    prevent-commands: false
+    duration: 2
+    allowed-spells:
+        - list
+        - help
+    str-silenced: "&f《 레비아탄&b레&3비&9아&1탄&f의 &e검 &f》레비아탄&b레&3비&9아&1탄의 힘에 의해 스킬을 쓸 수 없습니다..."
+    effects:
+      1:
+        position: target
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 10
+        vert-spread: 10
+        speed: 0.0001
+        count: 15
+        y-offset: 2
+
+레비아탄_R:
+  spell-class: ".MultiSpell"
+  right-click-cast-item: 레비아탄
+  cooldown: 15
+  modifiers:
+    - sneaking castinstead 레비아탄_SR
+  spells:
+    - 레비아탄_R_PP0
+
+레비아탄_R_PP0:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 50 #파티클의 속도
+    projectile-gravity: 0 #파티클의 중력 
+    projectile-horiz-offset: 0 #가로 각도
+    projectile-vert-offset: 0 #세로 각도
+    particle-name: instantspell #파티클 이름
+    particle-speed: 0.3 #1로 하면 엄청엄청 퍼짐
+    particle-count: 75 #파티클 갯수 보통 10 정도 , 많아도 30 까지만
+    particle-horizontal-spread: 0.25 #가로로 퍼지는 정도
+    particle-vertical-spread: 2.4 #세로로 퍼지는 정도
+    special-effect-interval: 1 #eff1로 되어있는 부분이 따라가는 정도?
+    tick-interval: 1 #이 PP스펠이 몇틱마다 구현이 되나
+    spell-interval: 1 #그냥 1로 하세용
+    max-distance: 18 #최대거리
+    max-duration: 1 #그냥 1로 하세용
+    hit-players: true #플레이어 타격
+    hit-non-players: true #플레이어가 아닌것은 타격을 안하나
+    hit-air-at-end: true #false로 하세용
+    start-forward-offset: 0 #앞 뒤 에서 나오는정도
+    start-y-offset: 0 #Y좌표의 위치
+    hit-radius: 4 #가로 타격 범위
+    vertical-hit-radius: 4 #세로 타격범위
+    stop-on-hit-entity: false #플레이어 타격시 스펠이 끝나나
+    stop-on-hit-ground: true #땅에 닿으면 스펠이 끝나나, 만약 다른 PP스펠이나 그런게 있으면 발동됨
+    spell: 레비아탄_R_spell 
+    effects:
+        eff1:
+            effect: sound
+            sound: entity.wither.shoot
+            pitch: 0.1
+            volume: 0.4
+            position: special
+        eff2:
+            position: special #저번 강좌 참고
+            effect: particles 
+            particle-name: MagicCrit
+            horiz-spread: 0.4
+            vert-spread: 2.7
+            speed: 0.3
+            count: 27
+        eff3:
+            position: special #저번 강좌 참고
+            effect: particles 
+            particle-name: reddust
+            horiz-spread: 0.4
+            vert-spread: 2.7
+            speed: 0.0001
+            count: 27
+
+
+
+레비아탄_R_blink: 
+    spell-class: ".targeted.BlinkSpell" 
+    range: 25     - 거리
+    pass-through-ceiling: false 
+    smoke-trail: true
+    str-cant-blink: You cannot blink there.
+
+레비아탄_R_spell:
+  spell-class: ".TargetedMultiSpell"
+  spells:
+    - 레비아탄_R_blink
+    - 레비아탄_leap
+    - 레비아탄_R_DamageAOE
+    - DELAY 10
+    - 레비아탄_R_DamageAOE
+    - DELAY 10
+    - 레비아탄_R_DamageAOE
+
+레비아탄_R_stun:
+    spell-class: ".targeted.StunSpell"
+    duration: 1
+    effects:
+      3:
+        position: buff
+        effect: effectlibentity
+        effectlib:
+            class: EquationEffect
+            xEquation: "sin(0.2t)"
+            yEquation: "1"
+            zEquation: "cos(0.2t)"
+            duration: 500
+            particle: cloud
+            particles: 1
+            cycle: false
+            speed: 0.0001
+            orient: true
+            orientPitch: false 
+      4:
+        position: buff
+        effect: effectlibentity
+        effectlib:
+            class: EquationEffect
+            xEquation: "sin(0.1t)"
+            yEquation: "1"
+            zEquation: "cos(0.1t)"
+            duration: 500
+            particle: magicCrit
+            particles: 1
+            cycle: false
+            speed: 0.1
+            orient: true
+            orientPitch: false
+
+
+레비아탄_R_DamageAOE:
+    spell-class: ".targeted.AreaEffectSpell"
+    horizontal-radius: 10
+    vertical-radius: 10
+    point-blank: false
+    fail-if-no-targets: false
+    max-targets: 99999
+    target-players: true
+    spells:
+        - 레비아탄_R_Damage
+        - 레비아탄_R_stun
+        - 레비아탄_R_silence
+
+레비아탄_R_Damage:
+    spell-class: ".targeted.PainSpell"
+    damage: 5
+    effects:
+      1:
+        effect: particles
+        particle-name: cloud
+        horiz-spread: 0.5
+        vert-spread: 0.5
+        count: 15
+        speed: 0.05
+        position: target
+        y-offset: 1
+      2:
+        effect: lightning
+        position: target
+      3:
+        effect: sound
+        sound: mob.irongolem.death
+        pitch: 2.4
+        volume: 1
+        position: target
+      4:
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 0.5
+        vert-spread: 0.5
+        count: 15
+        speed: 0.05
+        position: target
+        y-offset: 1
+
+
+#쉬프트 좌클릭-----------------------------------------------------------------------------------
+레비아탄_SL_spell:
+    spell-class: ".MultiSpell"
+    cooldown: 80
+    modifiers:
+        - sneaking required
+    spells:
+      - 레비아탄_SL_ti
+
+레비아탄_SL_At:
+    spell-class: ".targeted.AreaEffectSpell"
+    horizontal-radius: 20
+    vertical-radius: 20
+    target-players: true
+    target-non-players: true 
+    max-targets: 9999
+    point-blank: true
+    target-caster: false 
+    target-invisible-players: true 
+    fail-if-no-targets: false
+    spell-source-in-center: true
+    spells: 
+        - 레비아탄_SL_At_1
+        - 레비아탄_SL_At_stun
+    
+
+레비아탄_SL_At_stun:
+    spell-class: ".targeted.StunSpell"
+    duration: 2
+    target-self: false
+    effects:
+      1:
+        position: target
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 0.9
+        vert-spread: 1.5
+        count: 150
+        speed: 2.4
+        y-offset: 0.4
+      2:
+        position: target
+        effect: particles
+        particle-name: spell
+        horiz-spread: 0.9
+        vert-spread: 1.5
+        count: 150
+        speed: 2.4
+        y-offset: 0.4
+
+레비아탄_SL_At_1:
+    spell-class: ".targeted.PainSpell"
+    damage: 12
+    effects:
+      1:
+        effect: lightning
+        position: target
+        
+레비아탄_SL_ti:
+    spell-class: ".buff.DummySpell"
+    duration: 12
+    effects:
+      1:
+        effect: sound
+        sound: entity.wither.shoot
+        position: caster
+        volume: 1.5
+        pitch: 0.5
+        
+레비아탄_SL_ef:
+    spell-class: ".instant.DummySpell"
+    effects:
+      1:
+        effect: particles
+        particle-name: cloud
+        position: caster
+        horiz-spread: 4.5
+        vert-spread: 1
+        count: 150
+        speed: 0.001
+        y-offset: 8
+      2:
+        effect: particles
+        particle-name: magicCrit
+        position: caster
+        horiz-spread: 4.5
+        vert-spread: 1
+        count: 625
+        speed: 0.00001
+        y-offset: 8
+
+레비아탄_SL_P:
+    spell-class: ".PassiveSpell"
+    always-granted: true
+    can-cast-by-command: false
+    triggers:
+        - ticks 30
+    modifiers:
+        - buffactive 레비아탄_SL_ti required
+    spells:
+        - 레비아탄_SL_At
+
+레비아탄_SL_P2:
+    spell-class: ".PassiveSpell"
+    always-granted: true
+    can-cast-by-command: false
+    triggers:
+        - ticks 3
+    modifiers:
+        - buffactive 레비아탄_SL_ti required
+    spells:
+        - 레비아탄_SL_ef
+        
+#SR================================================================
+레비아탄_SR:
+    spell-class: ".MultiSpell"
+    cooldown: 240
+    spells:
+      - 레비아탄_SR_Round_PP
+      - 레비아탄_SR_L_time
+
+레비아탄_SR_Round_PP: #실질적인 스킬의 시작입니다. 타겟멀티를 사용합니다.
+    spell-class: ".MultiSpell"
+    spells:
+        - 레비아탄_SR_Round_PP_1 #원형 pp를 발사합니다.
+        - 레비아탄_SR_Round_PP_2
+        - 레비아탄_SR_Round_PP_3
+        - 레비아탄_SR_Round_PP_4
+        - 레비아탄_SR_Round_PP_5
+        - 레비아탄_SR_Round_PP_6
+        - 레비아탄_SR_Round_PP_7
+        - 레비아탄_SR_Round_PP_8
+        - 레비아탄_SR_Round_PP_9
+        - 레비아탄_SR_Round_PP_10
+        - 레비아탄_SR_Round_PP_11
+        - 레비아탄_SR_Round_PP_12
+        - 레비아탄_SR_Round_PP_13
+        - 레비아탄_SR_Round_PP_14
+        - 레비아탄_SR_Round_PP_15
+        - 레비아탄_SR_Round_PP_16
+        - 레비아탄_SR_Round_PP_17
+        - 레비아탄_SR_Round_PP_18
+        - 레비아탄_SR_Round_PP_19
+        - 레비아탄_SR_Round_PP_20
+        - 레비아탄_SR_Round_PP_21
+        - 레비아탄_SR_Round_PP_22
+        - 레비아탄_SR_Round_PP_23
+        - 레비아탄_SR_Round_PP_24
+        - 레비아탄_SR_Round_PP_25
+        - 레비아탄_SR_Round_PP_26
+        - 레비아탄_SR_Round_PP_27
+        - 레비아탄_SR_Round_PP_28
+        - 레비아탄_SR_Round_PP_29
+        - 레비아탄_SR_Round_PP_30
+        - 레비아탄_SR_Round_PP_31
+        - 레비아탄_SR_Round_PP_32
+        - 레비아탄_SR_Round_PP_33
+        - 레비아탄_SR_Round_PP_34
+        - 레비아탄_SR_Round_PP_35
+        - 레비아탄_SR_Round_PP_36
+    effects:
+      1:
+        position: caster
+        effect: sound
+        sound: entity.irongolem.death
+        volume: 0.3
+        pitch: 2.4
+        
+레비아탄_SR_Round_PP_1:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 10
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_2:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 20
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_3:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 30
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_4:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 40
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_5:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 50
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_6:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 60
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_7:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 70
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_8:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 80
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_9:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 90
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_10:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 100
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_11:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 110
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_12:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 120
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_13:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 130
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_14:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 140
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_15:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 150
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_16:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 160
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_17:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 170
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_18:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 180
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_19:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 190
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_20:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 200
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_21:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 210
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_22:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 220
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_23:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 230
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_24:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 240
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_25:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 250
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_26:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 260
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_27:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 270
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_28:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 280
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_29:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 290
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_30:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 300
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_31:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 310
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_32:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 320
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_33:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 330
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_34:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 340
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+레비아탄_SR_Round_PP_35:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 350
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+
+레비아탄_SR_Round_PP_36:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 30
+    projectile-horiz-offset: 360
+    projectile-vert-offset: 0
+    projectile-gravity: 0
+    projectile-spread: 0
+    hug-surface: true
+    height-from-surface: 0.1
+    tick-interval: 1
+    spell-interval: 1
+    special-effect-interval: 1
+    particle-name: reddust
+    particle-speed: 0.001
+    particle-count: 50
+    particle-horizontal-spread: 2.4
+    particle-vertical-spread: 18
+    start-forward-offset: 0
+    start-y-offset: 0.1
+    max-radius: 1
+    max-distance: 60
+    hit-players: true
+    hit-non-players: true
+    stop-on-hit-entity: false
+    hit-air-during: false
+    hit-air-at-end: false
+    hit-ground: true
+    spell: 레비아탄_SR_At_1
+    stop-on-hit-ground: true
+    effects:
+      1:
+        position: special
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 2.4
+        vert-spread: 18
+        speed: 0.0001
+        count: 50
+
+레비아탄_SR_At_1:
+  spell-class: ".TargetedMultiSpell"
+  spells:
+    - 레비아탄_SR_At_stun
+    - DELAY 60
+    - 레비아탄_SR_At_1_1
+
+레비아탄_SR_At_1_1:
+    spell-class: ".targeted.PainSpell"
+    damage: 560
+    effects:
+      1:
+        effect: lightning
+        position: target
+
+레비아탄_SR_At_stun:
+    spell-class: ".targeted.StunSpell"
+    duration: 3
+    target-self: false
+    effects:
+      1:
+        position: target
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 0.9
+        vert-spread: 1.5
+        count: 150
+        speed: 2.4
+        y-offset: 2
+      2:
+        position: target
+        effect: particles
+        particle-name: instantspell
+        horiz-spread: 0.9
+        vert-spread: 1.5
+        count: 150
+        speed: 2.4
+        y-offset: 2
+
+레비아탄_SR_L_time:
+    spell-class: ".buff.DummySpell"
+    duration: 30
+    effects:
+      1:
+        effect: particles
+        particle-name: MagicCrit
+        position: special
+        horiz-spread: 0.5
+        vert-spread: 0.1
+        count: 150
+        speed: 2.4
+        y-offset: 0.1
+      2:
+        effect: sound
+        sound: entity.wither.spawn
+        pitch: 0.1
+        volume: 0.4
+      3:
+        effect: particles
+        particle-name: instantSpell
+        position: special
+        horiz-spread: 0.5
+        vert-spread: 0.1
+        count: 150
+        speed: 2.4
+        y-offset: 0.1
+
+레비아탄_SR_L_dummy:
+  spell-class: ".instant.DummySpell"
+  cast-item: 레비아탄
+  modifiers:
+    - buffactive 레비아탄_SR_L_time castinstead 레비아탄_SR_L
+    - sneaking castinstead 레비아탄_SL_spell
+
+레비아탄_SR_L:
+  spell-class: ".MultiSpell"
+  spells:
+    - 레비아탄_SR_L_PP0
+
+레비아탄_SR_L_PP0:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 50 #파티클의 속도
+    projectile-gravity: 0 #파티클의 중력 
+    projectile-horiz-offset: 0 #가로 각도
+    projectile-vert-offset: 0 #세로 각도
+    particle-name: reddust #파티클 이름
+    particle-speed: 0.0001 #1로 하면 엄청엄청 퍼짐
+    particle-count: 75 #파티클 갯수 보통 10 정도 , 많아도 30 까지만
+    particle-horizontal-spread: 0.25 #가로로 퍼지는 정도
+    particle-vertical-spread: 2.4 #세로로 퍼지는 정도
+    special-effect-interval: 1 #eff1로 되어있는 부분이 따라가는 정도?
+    tick-interval: 1 #이 PP스펠이 몇틱마다 구현이 되나
+    spell-interval: 1 #그냥 1로 하세용
+    max-distance: 18 #최대거리
+    max-duration: 1 #그냥 1로 하세용
+    hit-players: true #플레이어 타격
+    hit-non-players: true #플레이어가 아닌것은 타격을 안하나
+    hit-air-at-end: true #false로 하세용
+    start-forward-offset: 0 #앞 뒤 에서 나오는정도
+    start-y-offset: 0 #Y좌표의 위치
+    hit-radius: 4 #가로 타격 범위
+    vertical-hit-radius: 4 #세로 타격범위
+    stop-on-hit-entity: false #플레이어 타격시 스펠이 끝나나
+    stop-on-hit-ground: true #땅에 닿으면 스펠이 끝나나, 만약 다른 PP스펠이나 그런게 있으면 발동됨
+    spell: 레비아탄_SR_L_spell 
+    effects:
+        eff1:
+            effect: sound
+            sound: entity.wither.shoot
+            pitch: 0.1
+            volume: 0.4
+            position: special
+        eff2:
+            position: special #저번 강좌 참고
+            effect: particles 
+            particle-name: MagicCrit
+            horiz-spread: 0.4
+            vert-spread: 2.7
+            speed: 0.3
+            count: 27
+        eff3:
+            position: special #저번 강좌 참고
+            effect: particles 
+            particle-name: reddust
+            horiz-spread: 0.4
+            vert-spread: 2.7
+            speed: 0.0001
+            count: 27
+
+레비아탄_SR_L_PP1:
+    spell-class: ".instant.ParticleProjectileSpell"
+    projectile-velocity: 50 #파티클의 속도
+    projectile-gravity: 0 #파티클의 중력 
+    projectile-horiz-offset: 0 #가로 각도
+    projectile-vert-offset: 0 #세로 각도
+    particle-name: reddust #파티클 이름
+    particle-speed: 0.0001 #1로 하면 엄청엄청 퍼짐
+    particle-count: 75 #파티클 갯수 보통 10 정도 , 많아도 30 까지만
+    particle-horizontal-spread: 0.25 #가로로 퍼지는 정도
+    particle-vertical-spread: 2.4 #세로로 퍼지는 정도
+    special-effect-interval: 1 #eff1로 되어있는 부분이 따라가는 정도?
+    tick-interval: 1 #이 PP스펠이 몇틱마다 구현이 되나
+    spell-interval: 1 #그냥 1로 하세용
+    max-distance: 18 #최대거리
+    max-duration: 1 #그냥 1로 하세용
+    hit-players: true #플레이어 타격
+    hit-non-players: true #플레이어가 아닌것은 타격을 안하나
+    hit-air-at-end: true #false로 하세용
+    start-forward-offset: 0 #앞 뒤 에서 나오는정도
+    start-y-offset: 0 #Y좌표의 위치
+    hit-radius: 4 #가로 타격 범위
+    vertical-hit-radius: 4 #세로 타격범위
+    stop-on-hit-entity: false #플레이어 타격시 스펠이 끝나나
+    stop-on-hit-ground: true #땅에 닿으면 스펠이 끝나나, 만약 다른 PP스펠이나 그런게 있으면 발동됨
+    spell: 레비아탄_SR_L_spell 
+    effects:
+        eff1:
+            effect: sound
+            sound: entity.wither.shoot
+            pitch: 0.1
+            volume: 0.4
+            position: special
+        eff2:
+            position: special #저번 강좌 참고
+            effect: particles 
+            particle-name: MagicCrit
+            horiz-spread: 0.4
+            vert-spread: 2.7
+            speed: 0.3
+            count: 27
+        eff3:
+            position: special #저번 강좌 참고
+            effect: particles 
+            particle-name: reddust
+            horiz-spread: 0.4
+            vert-spread: 2.7
+            speed: 0.0001
+            count: 27
+
+
+레비아탄_SR_L_spell:
+  spell-class: ".TargetedMultiSpell"
+  spells:
+        - 레비아탄_SR_L_Damage
+        - 레비아탄_SR_L_stun
+        - 레비아탄_SR_L_silence
+
+레비아탄_SR_L_stun:
+    spell-class: ".targeted.StunSpell"
+    duration: 1
+    effects:
+      3:
+        position: buff
+        effect: effectlibentity
+        effectlib:
+            class: EquationEffect
+            xEquation: "sin(0.2t)"
+            yEquation: "1"
+            zEquation: "cos(0.2t)"
+            duration: 500
+            particle: cloud
+            particles: 1
+            cycle: false
+            speed: 0.0001
+            orient: true
+            orientPitch: false 
+      4:
+        position: buff
+        effect: effectlibentity
+        effectlib:
+            class: EquationEffect
+            xEquation: "sin(0.1t)"
+            yEquation: "1"
+            zEquation: "cos(0.1t)"
+            duration: 500
+            particle: magicCrit
+            particles: 1
+            cycle: false
+            speed: 0.1
+            orient: true
+            orientPitch: false
+
+
+레비아탄_SR_L_Damage:
+    spell-class: ".targeted.PainSpell"
+    damage: 5
+    effects:
+      1:
+        effect: particles
+        particle-name: cloud
+        horiz-spread: 0.5
+        vert-spread: 0.5
+        count: 15
+        speed: 0.05
+        position: target
+        y-offset: 1
+      2:
+        effect: lightning
+        position: target
+      3:
+        effect: sound
+        sound: mob.irongolem.death
+        pitch: 2.4
+        volume: 1
+        position: target
+      4:
+        effect: particles
+        particle-name: magicCrit
+        horiz-spread: 0.5
+        vert-spread: 0.5
+        count: 15
+        speed: 0.05
+        position: target
+        y-offset: 1
+
+레비아탄_SR_L_silence:
+    spell-class: ".targeted.SilenceSpell"
+    range: 1
+    prevent-cast: true
+    prevent-chat: false
+    prevent-commands: false
+    duration: 5
+    allowed-spells:
+        - list
+        - help
+    str-silenced: "&f《 레비아탄&b레&3비&9아&1탄&f의 &e검 &f》레비아탄&b레&3비&9아&1탄의 힘에 의해 스킬을 쓸 수 없습니다..."
+    effects:
+      1:
+        position: target
+        effect: particles
+        particle-name: instantspell
+        horiz-spread: 0.2
+        vert-spread: 0.2
+        speed: 0.0001
+        count: 150
+        y-offset: 2
